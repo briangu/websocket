@@ -11,6 +11,16 @@ case class ClientSocket(incoming: Offer[String], outgoing: Broker[String])
 object ClientFanout {
   var clients: Set[ClientSocket] = Set()
 
+  val backgroundThread = new Thread(new Runnable {
+    def run() {
+      while(!Thread.currentThread().isInterrupted) {
+        send(new Date().toString)
+        Thread.sleep(1000)
+      }
+    }
+  })
+
+  // TODO: obviously not thread safe
   def register(client: ClientSocket) { clients += client }
   def unregister(client: ClientSocket) { clients -= client }
 
@@ -18,16 +28,8 @@ object ClientFanout {
     Future.collect(clients.toSeq map { c => c.outgoing ! msg }) flatMap { _ => Future.Done }
   }
 
-  def run() {
-    new Thread(new Runnable {
-      def run() {
-        while(true) {
-          send(new Date().toString)
-          Thread.sleep(1000)
-        }
-      }
-    }).start()
-  }
+  def run() { backgroundThread.start() }
+  def stop() { backgroundThread.interrupt()}
 }
 
 object Server {
@@ -54,6 +56,7 @@ object Server {
     })
 
     Await.result(server)
+    ClientFanout.stop()
   }
 }
 

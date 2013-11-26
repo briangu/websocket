@@ -2,7 +2,7 @@ package com.ops5.moodora
 
 import com.twitter.finagle.HttpWebSocket
 import com.twitter.concurrent.Broker
-import com.twitter.util.{Promise, Await, Future}
+import com.twitter.util.{Promise, Await}
 
 object Client {
   def main(args: Array[String]) {
@@ -10,7 +10,7 @@ object Client {
 
     val wait = new Promise[Unit]()
 
-    val client = HttpWebSocket.open(out.recv, "ws://localhost:8080/") onSuccess { resp =>
+    HttpWebSocket.open(out.recv, "ws://localhost:8080/") onSuccess { resp =>
       out ! "hello, world"
 
       resp.onClose foreach { x =>
