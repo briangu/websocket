@@ -1,4 +1,6 @@
 websocket
 =========
 
-websocket sample based on finagle-websocket
+websocket sample based on https://github.com/sprsquish/finagle-websocket
+
+
