@@ -6,12 +6,12 @@ import com.twitter.util.{Promise, Await}
 
 object Client {
   def main(args: Array[String]) {
-    val out = new Broker[String]
+    val outgoing = new Broker[String]
 
     val wait = new Promise[Unit]()
 
-    HttpWebSocket.open(out.recv, "ws://localhost:8080/") onSuccess { resp =>
-      out ! "hello, world"
+    HttpWebSocket.open(outgoing.recv, "ws://localhost:8080/") onSuccess { resp =>
+      outgoing ! "hello, world"
 
       resp.onClose foreach { x =>
         println("closing")
@@ -23,7 +23,11 @@ object Client {
       resp.messages foreach { message =>
         println(message)
         count += 1
-        if (count == 10) {
+        if (count == 5) {
+          outgoing ! "I'm half way!"
+        } else if (count == 10) {
+          outgoing ! "I'm done!"
+        } else if (message == "I'm done!".reverse) {
           resp.close()
         }
       }
