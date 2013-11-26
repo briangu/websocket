@@ -1,5 +1,4 @@
 .idea
 *.iml
 target
-out
-src/main/resources/public/uploads
+
